@@ -160,3 +160,54 @@ def pokaz_formularz(typ):
         Button(ramka_formularza, text="Dodaj pracownika", command=dodaj_pracownika).grid(row=3, column=0, columnspan=2)
     elif typ == "klient":
         Button(ramka_formularza, text="Dodaj klienta", command=dodaj_klienta).grid(row=3, column=0, columnspan=2)
+
+
+okno = Tk()
+okno.geometry("1200x800")
+okno.title("Mapa Komisów Samochodowych")
+
+panel_lewy = Frame(okno)
+panel_lewy.grid(row=0, column=0, sticky=N)
+
+Button(panel_lewy, text="Formularz: Komis", command=lambda: pokaz_formularz("komis")).grid(row=0, column=0, columnspan=2)
+Button(panel_lewy, text="Formularz: Pracownik", command=lambda: pokaz_formularz("pracownik")).grid(row=1, column=0, columnspan=2)
+Button(panel_lewy, text="Formularz: Klient", command=lambda: pokaz_formularz("klient")).grid(row=2, column=0, columnspan=2)
+
+ramka_formularza = Frame(panel_lewy)
+ramka_formularza.grid(row=3, column=0, columnspan=2, pady=10)
+
+Button(panel_lewy, text="Pokaż wszystkie komisy", command=pokaz_komisy).grid(row=4, column=0, columnspan=2)
+Button(panel_lewy, text="Pokaż wszystkich pracowników", command=pokaz_pracownikow).grid(row=5, column=0, columnspan=2)
+
+Label(panel_lewy, text="Komis (dla klientów):").grid(row=6, column=0, columnspan=2)
+pole_klienci_komis = Entry(panel_lewy)
+pole_klienci_komis.grid(row=7, column=0, columnspan=2)
+Button(panel_lewy, text="Pokaż klientów", command=pokaz_klientow_dla_komisu).grid(row=8, column=0, columnspan=2)
+
+Label(panel_lewy, text="Komis (dla pracowników):").grid(row=9, column=0, columnspan=2)
+pole_pracownicy_komis = Entry(panel_lewy)
+pole_pracownicy_komis.grid(row=10, column=0, columnspan=2)
+Button(panel_lewy, text="Pokaż pracowników", command=pokaz_pracownikow_dla_komisu).grid(row=11, column=0, columnspan=2)
+
+Label(panel_lewy, text="Komisy").grid(row=12, column=0)
+lista_komisow_box = Listbox(panel_lewy, height=5)
+lista_komisow_box.grid(row=13, column=0, columnspan=2)
+
+Label(panel_lewy, text="Pracownicy").grid(row=14, column=0)
+lista_pracownikow_box = Listbox(panel_lewy, height=5)
+lista_pracownikow_box.grid(row=15, column=0, columnspan=2)
+
+Label(panel_lewy, text="Klienci").grid(row=16, column=0)
+lista_klientow_box = Listbox(panel_lewy, height=5)
+lista_klientow_box.grid(row=17, column=0, columnspan=2)
+
+# Prawy panel – mapa
+panel_prawy = Frame(okno)
+panel_prawy.grid(row=0, column=1)
+
+mapa = tkintermapview.TkinterMapView(panel_prawy, width=800, height=800, corner_radius=0)
+mapa.set_position(52.23, 21.01)  # Warszawa
+mapa.set_zoom(6)
+mapa.pack(fill="both", expand=True)
+
+okno.mainloop()
