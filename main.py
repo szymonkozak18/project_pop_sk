@@ -4,12 +4,10 @@ import requests
 from bs4 import BeautifulSoup
 from collections import defaultdict
 
-
 lista_komisow = []
 lista_pracownikow = []
 lista_klientow = []
 wszystkie_markery = []
-
 
 ilosc_markerow_na_lokalizacji = defaultdict(int)
 
@@ -30,7 +28,7 @@ class ObiektMapy:
             return [latitude, longitude]
         except Exception as e:
             print(f"Błąd pobierania współrzędnych dla {self.miejscowosc}: {e}")
-            return [52.23, 21.01]  # Domyślna: Warszawa
+            return [52.23, 21.01]
 
 class Komis(ObiektMapy):
     pass
@@ -45,9 +43,7 @@ class Klient(ObiektMapy):
         self.komis = komis
         super().__init__(nazwa, miejscowosc)
 
-
 def dodaj_przesuniecie(wspolrzedne):
-    """Zwraca delikatnie przesunięte współrzędne, aby napisy się nie nakładały."""
     lat, lon = wspolrzedne
     ilosc = ilosc_markerow_na_lokalizacji[(lat, lon)]
     ilosc_markerow_na_lokalizacji[(lat, lon)] += 1
@@ -162,6 +158,134 @@ def pokaz_formularz(typ):
         Button(ramka_formularza, text="Dodaj klienta", command=dodaj_klienta).grid(row=3, column=0, columnspan=2)
 
 
+
+def edytuj_komis():
+    zaznaczony = lista_komisow_box.curselection()
+    if not zaznaczony:
+        return
+    indeks = zaznaczony[0]
+    komis = lista_komisow[indeks]
+
+    edycja_okno = Toplevel(okno)
+    edycja_okno.title("Edytuj komis")
+
+    Label(edycja_okno, text="Nazwa").grid(row=0, column=0)
+    entry_nazwa = Entry(edycja_okno)
+    entry_nazwa.insert(0, komis.nazwa)
+    entry_nazwa.grid(row=0, column=1)
+
+    Label(edycja_okno, text="Miejscowość").grid(row=1, column=0)
+    entry_miejsc = Entry(edycja_okno)
+    entry_miejsc.insert(0, komis.miejscowosc)
+    entry_miejsc.grid(row=1, column=1)
+
+    def zapisz():
+        komis.nazwa = entry_nazwa.get()
+        komis.miejscowosc = entry_miejsc.get()
+        komis.wspolrzedne = komis.pobierz_wspolrzedne()
+        lista_komisow_box.delete(indeks)
+        lista_komisow_box.insert(indeks, komis.nazwa)
+        edycja_okno.destroy()
+
+    Button(edycja_okno, text="Zapisz", command=zapisz).grid(row=2, column=0, columnspan=2)
+
+def usun_komis():
+    zaznaczony = lista_komisow_box.curselection()
+    if not zaznaczony:
+        return
+    indeks = zaznaczony[0]
+    del lista_komisow[indeks]
+    lista_komisow_box.delete(indeks)
+
+def edytuj_pracownika():
+    zaznaczony = lista_pracownikow_box.curselection()
+    if not zaznaczony:
+        return
+    indeks = zaznaczony[0]
+    pracownik = lista_pracownikow[indeks]
+
+    edycja_okno = Toplevel(okno)
+    edycja_okno.title("Edytuj pracownika")
+
+    Label(edycja_okno, text="Nazwa").grid(row=0, column=0)
+    entry_nazwa = Entry(edycja_okno)
+    entry_nazwa.insert(0, pracownik.nazwa)
+    entry_nazwa.grid(row=0, column=1)
+
+    Label(edycja_okno, text="Miejscowość").grid(row=1, column=0)
+    entry_miejsc = Entry(edycja_okno)
+    entry_miejsc.insert(0, pracownik.miejscowosc)
+    entry_miejsc.grid(row=1, column=1)
+
+    Label(edycja_okno, text="Komis").grid(row=2, column=0)
+    entry_komis = Entry(edycja_okno)
+    entry_komis.insert(0, pracownik.komis)
+    entry_komis.grid(row=2, column=1)
+
+    def zapisz():
+        pracownik.nazwa = entry_nazwa.get()
+        pracownik.miejscowosc = entry_miejsc.get()
+        pracownik.komis = entry_komis.get()
+        pracownik.wspolrzedne = pracownik.pobierz_wspolrzedne()
+        lista_pracownikow_box.delete(indeks)
+        lista_pracownikow_box.insert(indeks, pracownik.nazwa)
+        edycja_okno.destroy()
+
+    Button(edycja_okno, text="Zapisz", command=zapisz).grid(row=3, column=0, columnspan=2)
+
+def usun_pracownika():
+    zaznaczony = lista_pracownikow_box.curselection()
+    if not zaznaczony:
+        return
+    indeks = zaznaczony[0]
+    del lista_pracownikow[indeks]
+    lista_pracownikow_box.delete(indeks)
+
+def edytuj_klienta():
+    zaznaczony = lista_klientow_box.curselection()
+    if not zaznaczony:
+        return
+    indeks = zaznaczony[0]
+    klient = lista_klientow[indeks]
+
+    edycja_okno = Toplevel(okno)
+    edycja_okno.title("Edytuj klienta")
+
+    Label(edycja_okno, text="Nazwa").grid(row=0, column=0)
+    entry_nazwa = Entry(edycja_okno)
+    entry_nazwa.insert(0, klient.nazwa)
+    entry_nazwa.grid(row=0, column=1)
+
+    Label(edycja_okno, text="Miejscowość").grid(row=1, column=0)
+    entry_miejsc = Entry(edycja_okno)
+    entry_miejsc.insert(0, klient.miejscowosc)
+    entry_miejsc.grid(row=1, column=1)
+
+    Label(edycja_okno, text="Komis").grid(row=2, column=0)
+    entry_komis = Entry(edycja_okno)
+    entry_komis.insert(0, klient.komis)
+    entry_komis.grid(row=2, column=1)
+
+    def zapisz():
+        klient.nazwa = entry_nazwa.get()
+        klient.miejscowosc = entry_miejsc.get()
+        klient.komis = entry_komis.get()
+        klient.wspolrzedne = klient.pobierz_wspolrzedne()
+        lista_klientow_box.delete(indeks)
+        lista_klientow_box.insert(indeks, klient.nazwa)
+        edycja_okno.destroy()
+
+    Button(edycja_okno, text="Zapisz", command=zapisz).grid(row=3, column=0, columnspan=2)
+
+def usun_klienta():
+    zaznaczony = lista_klientow_box.curselection()
+    if not zaznaczony:
+        return
+    indeks = zaznaczony[0]
+    del lista_klientow[indeks]
+    lista_klientow_box.delete(indeks)
+
+
 okno = Tk()
 okno.geometry("1200x800")
 okno.title("Mapa Komisów Samochodowych")
@@ -192,21 +316,26 @@ Button(panel_lewy, text="Pokaż pracowników", command=pokaz_pracownikow_dla_kom
 Label(panel_lewy, text="Komisy").grid(row=12, column=0)
 lista_komisow_box = Listbox(panel_lewy, height=5)
 lista_komisow_box.grid(row=13, column=0, columnspan=2)
+Button(panel_lewy, text="Edytuj komis", command=edytuj_komis).grid(row=14, column=0)
+Button(panel_lewy, text="Usuń komis", command=usun_komis).grid(row=14, column=1)
 
-Label(panel_lewy, text="Pracownicy").grid(row=14, column=0)
+Label(panel_lewy, text="Pracownicy").grid(row=15, column=0)
 lista_pracownikow_box = Listbox(panel_lewy, height=5)
-lista_pracownikow_box.grid(row=15, column=0, columnspan=2)
+lista_pracownikow_box.grid(row=16, column=0, columnspan=2)
+Button(panel_lewy, text="Edytuj pracownika", command=edytuj_pracownika).grid(row=17, column=0)
+Button(panel_lewy, text="Usuń pracownika", command=usun_pracownika).grid(row=17, column=1)
 
-Label(panel_lewy, text="Klienci").grid(row=16, column=0)
+Label(panel_lewy, text="Klienci").grid(row=18, column=0)
 lista_klientow_box = Listbox(panel_lewy, height=5)
-lista_klientow_box.grid(row=17, column=0, columnspan=2)
+lista_klientow_box.grid(row=19, column=0, columnspan=2)
+Button(panel_lewy, text="Edytuj klienta", command=edytuj_klienta).grid(row=20, column=0)
+Button(panel_lewy, text="Usuń klienta", command=usun_klienta).grid(row=20, column=1)
 
-# Prawy panel – mapa
 panel_prawy = Frame(okno)
 panel_prawy.grid(row=0, column=1)
 
 mapa = tkintermapview.TkinterMapView(panel_prawy, width=800, height=800, corner_radius=0)
-mapa.set_position(52.23, 21.01)  # Warszawa
+mapa.set_position(52.23, 21.01)
 mapa.set_zoom(6)
 mapa.pack(fill="both", expand=True)
 
